@@ -12,9 +12,15 @@ const filters = useFiltersStore();
 </script>
 
 <template>
-  <main class="min-h-screen p-4 md:p-6 space-y-4">
-    <header class="flex items-center justify-between">
-      <h1 class="text-xl font-bold">Real-Time Analytics</h1>
+  <main class="min-h-screen space-y-4 bg-background p-4 text-foreground md:p-6">
+    <header class="flex flex-col gap-1 sm:flex-row sm:items-end sm:justify-between">
+      <div>
+        <p class="text-sm text-muted-foreground">Telemetry Operations Center</p>
+        <h1 class="text-2xl font-bold">Real-Time Analytics</h1>
+      </div>
+      <p class="text-sm text-muted-foreground">
+        Web Worker stream, schema validation, virtualized events
+      </p>
     </header>
 
     <ControlsBar />
@@ -34,11 +40,12 @@ const filters = useFiltersStore();
       </section>
 
       <section class="grid grid-cols-1 xl:grid-cols-3 gap-4">
-        <div
-          class="xl:col-span-2 bg-card border border-border rounded-xl p-4 h-[500px]"
-        >
-          <SeriesChart :type="filters.chartType" title="Detailed Timeline" />
-        </div>
+        <SeriesChart
+          class="xl:col-span-2"
+          :type="filters.chartType"
+          title="Detailed Timeline"
+          height-class="h-[500px]"
+        />
         <ActivityFeed />
       </section>
     </ErrorBoundary>

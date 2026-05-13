@@ -12,19 +12,19 @@ export const useMetricsStore = defineStore("metrics", () => {
       string,
       { last: number; avg: number; min: number; max: number; count: number }
     > = {};
-    for (const [sym, buf] of stream.bufferEntries()) {
+    for (const [sym, buf] of Object.entries(stream.ticksBySymbol)) {
       const arr = buf.toArray();
       if (!arr.length) continue;
       let sum = 0,
         min = Infinity,
         max = -Infinity;
       for (const t of arr) {
-        sum += t.price;
-        if (t.price < min) min = t.price;
-        if (t.price > max) max = t.price;
+        sum += t.value;
+        if (t.value < min) min = t.value;
+        if (t.value > max) max = t.value;
       }
       out[sym] = {
-        last: arr[arr.length - 1].price,
+        last: arr[arr.length - 1].value,
         avg: sum / arr.length,
         min,
         max,
@@ -37,7 +37,7 @@ export const useMetricsStore = defineStore("metrics", () => {
   const totalTicks = computed(() => {
     void stream.version;
     let n = 0;
-    for (const [, buf] of stream.bufferEntries()) n += buf.size;
+    for (const [, buf] of Object.entries(stream.ticksBySymbol)) n += buf.length;
     return n;
   });
 

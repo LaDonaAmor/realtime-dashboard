@@ -10,7 +10,7 @@ onErrorCaptured((e) => {
 <template>
   <div
     v-if="err"
-    class="p-4 bg-error/10 border border-error rounded-xl text-sm"
+    class="rounded-lg border border-error bg-error/10 p-4 text-sm"
   >
     Something went wrong: {{ err.message }}
     <button class="ml-2 underline" @click="err = null">Retry</button>
