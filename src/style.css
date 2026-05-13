@@ -31,6 +31,9 @@ body,
   height: 100%;
 }
 body {
+  margin: 0;
+  background: var(--color-background);
+  color: var(--color-foreground);
   font-family:
     ui-sans-serif,
     system-ui,

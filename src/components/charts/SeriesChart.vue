@@ -4,7 +4,14 @@ import BaseChart from "./BaseChart.vue";
 import { useStreamStore } from "@/stores/stream.store";
 import { useFiltersStore } from "@/stores/filters.store";
 
-const props = defineProps<{ type: "line" | "bar" | "area"; title: string }>();
+const props = withDefaults(
+  defineProps<{
+    type: "line" | "bar" | "area";
+    title: string;
+    heightClass?: string;
+  }>(),
+  { heightClass: "h-72" },
+);
 const store = useStreamStore();
 const filters = useFiltersStore();
 
@@ -41,7 +48,7 @@ const option = computed(() => {
 </script>
 
 <template>
-  <div class="bg-card border border-border rounded-xl p-4 h-72">
+  <div class="bg-card border border-border rounded-lg p-4" :class="heightClass">
     <BaseChart :option="option" />
   </div>
 </template>

@@ -23,18 +23,18 @@ const trend = computed(() => {
 </script>
 
 <template>
-  <div class="bg-card border border-border rounded-xl p-4">
+  <div class="bg-card border border-border rounded-lg p-4 transition-colors">
     <div class="text-xs text-muted-foreground uppercase tracking-wide">
       {{ label }}
     </div>
     <div class="mt-1 text-2xl font-semibold tabular-nums">
-      {{ latest ? fmtNum(latest.value) : "—" }}
+      {{ latest ? fmtNum(latest.value) : "-" }}
     </div>
     <div
       class="text-xs mt-1 tabular-nums"
       :class="trend >= 0 ? 'text-success' : 'text-error'"
     >
-      {{ trend >= 0 ? "▲" : "▼" }} {{ fmtNum(Math.abs(trend)) }}
+      {{ trend >= 0 ? "+" : "-" }}{{ fmtNum(Math.abs(trend)) }}
     </div>
   </div>
 </template>

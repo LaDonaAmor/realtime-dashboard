@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { useTheme } from "@/composables/useTheme";
 const { isDark, toggle } = useTheme();
+const toggleTheme = () => toggle();
 </script>
 
 <template>
   <div class="shell" :data-theme="isDark ? 'dark' : 'light'">
     <header class="shell__header">
       <h1>Realtime Analytics</h1>
-      <button @click="toggle">{{ isDark ? "☀️" : "🌙" }}</button>
+      <button @click="toggleTheme">{{ isDark ? "Light" : "Dark" }}</button>
     </header>
     <main class="shell__main"><slot /></main>
   </div>

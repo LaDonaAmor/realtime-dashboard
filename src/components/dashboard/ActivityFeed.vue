@@ -1,54 +1,78 @@
-<!-- src/components/dashboard/ActivityFeed.vue -->
 <script setup lang="ts">
-import { computed, ref } from "vue";
+import { computed } from "vue";
 import { useVirtualList } from "@vueuse/core";
 import { useStreamStore } from "@/stores/stream.store";
+import { useFiltersStore } from "@/stores/filters.store";
 import { formatTime } from "@/lib/format";
+import type { Severity } from "@/types/models";
 
 const store = useStreamStore();
+const filters = useFiltersStore();
 
-// Reactive source list (newest first)
-const events = computed(() => store.events.toArray().slice().reverse());
+const severityClass: Record<Severity, string> = {
+  info: "bg-primary/15 text-primary",
+  warn: "bg-warn/15 text-warn",
+  error: "bg-error/15 text-error",
+  critical: "bg-critical/20 text-critical",
+};
 
-const containerRef = ref<HTMLElement | null>(null);
+const events = computed(() => {
+  void store.version;
+  const query = filters.search.toLowerCase();
+  return store.events
+    .toArray()
+    .slice()
+    .reverse()
+    .filter((event) => {
+      if (!filters.activeSymbols.has(event.source)) return false;
+      if (!query) return true;
+      return [event.severity, event.source, event.message]
+        .join(" ")
+        .toLowerCase()
+        .includes(query);
+    });
+});
 
 const { list, containerProps, wrapperProps } = useVirtualList(events, {
-  itemHeight: 56, // px per row — must match your row height
-  overscan: 8, // extra rows rendered above/below viewport
+  itemHeight: 64,
+  overscan: 10,
 });
 </script>
 
 <template>
-  <div class="rounded-lg border border-border bg-card">
-    <div class="border-b border-border px-4 py-2 text-sm font-medium">
-      Activity Feed
+  <aside class="rounded-lg border border-border bg-card">
+    <div class="flex items-center justify-between border-b border-border px-4 py-3">
+      <h2 class="text-sm font-semibold">Activity Feed</h2>
+      <span class="text-xs text-muted-foreground tabular-nums">{{ events.length }} events</span>
     </div>
 
-    <!-- containerProps gives you the scroll container -->
-    <div
-      v-bind="containerProps"
-      ref="containerRef"
-      class="h-[400px] overflow-auto"
-    >
-      <!-- wrapperProps sets the total scroll height + offset -->
+    <div v-if="events.length === 0" class="flex h-[400px] items-center justify-center px-4 text-sm text-muted-foreground">
+      No matching events yet.
+    </div>
+
+    <div v-else v-bind="containerProps" class="h-[400px] overflow-auto">
       <div v-bind="wrapperProps">
         <div
-          v-for="{ index, data } in list"
+          v-for="{ data } in list"
           :key="data.id"
-          class="flex items-center justify-between border-b border-border/50 px-4"
-          :style="{ height: '56px' }"
+          class="grid grid-cols-[auto_1fr_auto] items-center gap-3 border-b border-border/60 px-4"
+          :style="{ height: '64px' }"
         >
-          <div class="flex flex-col">
-            <span class="text-sm font-medium">{{ data.type }}</span>
-            <span class="text-xs text-muted-foreground">{{
-              data.message
-            }}</span>
-          </div>
-          <span class="text-xs text-muted-foreground">
-            {{ formatTime(data.timestamp) }}
+          <span
+            class="rounded px-2 py-1 text-[11px] font-semibold uppercase"
+            :class="severityClass[data.severity]"
+          >
+            {{ data.severity }}
           </span>
+          <div class="min-w-0">
+            <div class="truncate text-sm font-medium">{{ data.source }}</div>
+            <div class="truncate text-xs text-muted-foreground">{{ data.message }}</div>
+          </div>
+          <time class="text-xs text-muted-foreground tabular-nums" :datetime="new Date(data.t).toISOString()">
+            {{ formatTime(data.t) }}
+          </time>
         </div>
       </div>
     </div>
-  </div>
+  </aside>
 </template>

@@ -1,9 +1,8 @@
 <script setup lang="ts">
 import SeriesChart from "./SeriesChart.vue";
-import type { Tick } from "@/types/models";
-defineProps<{ data: Tick[]; symbol: string }>();
+defineProps<{ title?: string }>();
 </script>
 
 <template>
-  <SeriesChart :data="data" :symbol="symbol" type="bar" />
+  <SeriesChart type="bar" :title="title ?? 'Bar Chart'" />
 </template>
