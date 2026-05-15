@@ -16,6 +16,7 @@ export const useFiltersStore = defineStore("filters", () => {
     ({ "1m": 60_000, "5m": 300_000, "1h": 3_600_000, live: 30_000 })[
       timeRange.value
     ];
+
   const toggleSymbol = (s: string) => {
     const next = new Set(activeSymbols.value);
     next.has(s) ? next.delete(s) : next.add(s);

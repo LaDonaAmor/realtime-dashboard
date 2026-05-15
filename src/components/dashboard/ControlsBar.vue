@@ -1,7 +1,11 @@
 <script setup lang="ts">
 import { computed } from "vue";
 import { useStreamStore } from "@/stores/stream.store";
-import { useFiltersStore, type ChartType, type TimeRange } from "@/stores/filters.store";
+import {
+  useFiltersStore,
+  type ChartType,
+  type TimeRange,
+} from "@/stores/filters.store";
 import { useTheme } from "@/composables/useTheme";
 
 const stream = useStreamStore();
@@ -24,27 +28,46 @@ const chartTypes: Array<{ label: string; value: ChartType }> = [
 const symbols = ["CPU", "MEM", "NET", "DISK"];
 const activeCount = computed(() => filters.activeSymbols.size);
 const toggleTheme = () => toggle();
+
+const isSymbolActive = (symbol: string) => filters.activeSymbols.has(symbol);
+const toggleRange = (range: TimeRange) => {
+  filters.timeRange = range;
+};
+const toggleSymbol = (symbol: string) => {
+  filters.toggleSymbol(symbol);
+};
 </script>
 
 <template>
   <section class="bg-card border border-border rounded-lg p-3 md:p-4">
-    <div class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between">
+    <div
+      class="flex flex-col gap-3 xl:flex-row xl:items-center xl:justify-between"
+    >
       <div class="flex flex-wrap items-center gap-2">
         <button
           type="button"
           class="h-9 rounded-md px-3 text-sm font-medium transition-colors"
-          :class="stream.paused ? 'bg-primary text-background' : 'bg-muted text-foreground'"
+          :class="
+            stream.paused
+              ? 'bg-primary text-background'
+              : 'bg-muted text-foreground'
+          "
           @click="stream.togglePause"
         >
           {{ stream.paused ? "Resume" : "Pause" }}
         </button>
+
         <span
           class="inline-flex h-9 items-center gap-2 rounded-md border border-border px-3 text-xs font-medium"
           :class="stream.connected ? 'text-success' : 'text-error'"
         >
-          <span class="h-2 w-2 rounded-full" :class="stream.connected ? 'bg-success' : 'bg-error'" />
+          <span
+            class="h-2 w-2 rounded-full"
+            :class="stream.connected ? 'bg-success' : 'bg-error'"
+          />
           {{ stream.connected ? "Streaming" : "Disconnected" }}
         </span>
+
         <button
           type="button"
           class="h-9 rounded-md border border-border px-3 text-sm transition-colors hover:bg-muted"
@@ -61,8 +84,12 @@ const toggleTheme = () => toggle();
             :key="range.value"
             type="button"
             class="h-8 rounded px-3 text-sm transition-colors"
-            :class="filters.timeRange === range.value ? 'bg-primary text-background' : 'text-muted-foreground hover:text-foreground'"
-            @click="filters.timeRange = range.value"
+            :class="
+              filters.timeRange === range.value
+                ? 'bg-primary text-background'
+                : 'text-muted-foreground hover:text-foreground'
+            "
+            @click="toggleRange(range.value)"
           >
             {{ range.label }}
           </button>
@@ -73,32 +100,61 @@ const toggleTheme = () => toggle();
           class="h-10 rounded-md border border-border bg-background px-3 text-sm outline-none"
           aria-label="Chart type"
         >
-          <option v-for="type in chartTypes" :key="type.value" :value="type.value">
+          <option
+            v-for="type in chartTypes"
+            :key="type.value"
+            :value="type.value"
+          >
             {{ type.label }}
           </option>
         </select>
       </div>
     </div>
 
-    <div class="mt-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+    <div
+      class="mt-3 flex flex-col gap-3 md:flex-row md:items-center md:justify-between"
+    >
       <div class="flex flex-wrap gap-2">
-        <label
+        <button
           v-for="symbol in symbols"
           :key="symbol"
-          class="inline-flex h-9 cursor-pointer items-center gap-2 rounded-md border border-border px-3 text-sm transition-colors"
-          :class="filters.activeSymbols.has(symbol) ? 'bg-muted text-foreground' : 'text-muted-foreground'"
+          type="button"
+          class="inline-flex h-9 items-center gap-2 rounded-md border border-border px-3 text-sm transition-colors"
+          :class="
+            filters.activeSymbols.has(symbol)
+              ? 'bg-muted text-foreground'
+              : 'text-muted-foreground hover:text-foreground'
+          "
+          @click="filters.toggleSymbol(symbol)"
         >
-          <input
-            type="checkbox"
-            class="h-4 w-4 accent-primary"
-            :checked="filters.activeSymbols.has(symbol)"
-            @change="filters.toggleSymbol(symbol)"
-          />
+          <span
+            class="inline-flex h-4 w-4 items-center justify-center rounded border border-border"
+            :class="
+              filters.activeSymbols.has(symbol)
+                ? 'bg-primary border-primary'
+                : 'bg-transparent'
+            "
+            aria-hidden="true"
+          >
+            <svg
+              v-if="filters.activeSymbols.has(symbol)"
+              viewBox="0 0 20 20"
+              fill="none"
+              class="h-3 w-3 text-background"
+            >
+              <path
+                d="M16.7 5.7a1 1 0 0 1 0 1.4l-7.2 7.2a1 1 0 0 1-1.4 0L3.3 9.5a1 1 0 1 1 1.4-1.4l3.2 3.2 6.5-6.5a1 1 0 0 1 1.4 0Z"
+                fill="currentColor"
+              />
+            </svg>
+          </span>
           {{ symbol }}
-        </label>
+        </button>
       </div>
 
-      <label class="flex min-w-0 items-center gap-2 text-sm text-muted-foreground">
+      <label
+        class="flex min-w-0 items-center gap-2 text-sm text-muted-foreground"
+      >
         Search logs
         <input
           v-model.trim="filters.search"
