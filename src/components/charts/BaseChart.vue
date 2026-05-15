@@ -32,6 +32,7 @@ const safeOption = computed(() => markRaw(props.option));
   <div class="w-full h-full min-h-[220px]">
     <VChart
       ref="chartRef"
+      class="w-full h-full"
       :option="safeOption"
       autoresize
       :update-options="{ notMerge: false, lazyUpdate: true }"
